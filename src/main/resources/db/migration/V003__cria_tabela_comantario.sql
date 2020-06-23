@@ -1,0 +1,13 @@
+/**
+ * Author:  manoel
+ * Created: 23 de jun de 2020
+ */
+
+create table comentario(
+  id bigint not null auto_increment,
+  ordem_servico_id bigint not null,
+  descricao text not null,
+  data_envio datetime not null,
+  primary key (id),
+  foreign key (ordem_servico_id) references ordem_servico(id)
+);

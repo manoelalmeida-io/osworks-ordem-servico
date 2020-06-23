@@ -1,7 +1,7 @@
 package com.example.osworks.api.exceptionhandler;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,7 +12,7 @@ import lombok.Setter;
 public class ExceptionResponseBody {
 
 	private Integer status;
-	private LocalDateTime datahora;
+	private OffsetDateTime datahora;
 	private String titulo;
 	private List<Campo> campos;
 	

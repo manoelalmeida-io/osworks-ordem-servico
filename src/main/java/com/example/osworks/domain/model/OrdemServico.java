@@ -1,8 +1,10 @@
 package com.example.osworks.domain.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.example.osworks.domain.exception.NegocioException;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -11,8 +13,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,26 +25,34 @@ public class OrdemServico {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@NotNull
 	@ManyToOne
 	private Cliente cliente;
 	
-	@NotBlank
 	private String descricao;
-	
-	@NotNull
 	private BigDecimal preco;
 	
 	@Enumerated(EnumType.STRING)
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	private StatusOrdemServico status;
 	
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	private LocalDateTime dataAbertura;
+	private OffsetDateTime dataAbertura;
+	private OffsetDateTime dataFinalizacao;
 	
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	private LocalDateTime dataFinalizacao;
+	@OneToMany(mappedBy = "ordemServico")
+	private List<Comentario> comentarios = new ArrayList<>();
 
+	public boolean podeSerFinalizada() {
+		return status.equals(StatusOrdemServico.ABERTA);
+	}
+	
+	public void finalizar() {
+		if (!podeSerFinalizada()) {
+			throw new NegocioException("Ordem de serviço não pode ser finalizada");
+		}
+		
+		setStatus(StatusOrdemServico.FINALIZADA);
+		setDataFinalizacao(OffsetDateTime.now());
+	}
+	
 	@Override
 	public int hashCode() {
 		int hash = 7;

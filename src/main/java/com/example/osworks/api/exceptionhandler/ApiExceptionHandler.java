@@ -1,7 +1,8 @@
 package com.example.osworks.api.exceptionhandler;
 
+import com.example.osworks.domain.exception.EntidadeNaoEncontradaException;
 import com.example.osworks.domain.exception.NegocioException;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -23,13 +24,24 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	@Autowired
 	private MessageSource messageSource;
 	
+	@ExceptionHandler(EntidadeNaoEncontradaException.class)
+	public ResponseEntity<Object> handleEntidadeNaoEncontrada(EntidadeNaoEncontradaException ex, WebRequest request) {
+		var status = HttpStatus.NOT_FOUND;
+		var problema = new ExceptionResponseBody();
+		problema.setStatus(status.value());
+		problema.setTitulo(ex.getMessage());
+		problema.setDatahora(OffsetDateTime.now());
+		
+		return handleExceptionInternal(ex, problema, new HttpHeaders(), status, request);
+	}
+	
 	@ExceptionHandler(NegocioException.class)
 	public ResponseEntity<Object> handleNegocio(NegocioException ex, WebRequest request) {
 		var status = HttpStatus.BAD_REQUEST;
 		var problema = new ExceptionResponseBody();
 		problema.setStatus(status.value());
 		problema.setTitulo(ex.getMessage());
-		problema.setDatahora(LocalDateTime.now());
+		problema.setDatahora(OffsetDateTime.now());
 		
 		return handleExceptionInternal(ex, problema, new HttpHeaders(), status, request);
 	}
@@ -50,7 +62,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		var response = new ExceptionResponseBody();
 		response.setStatus(status.value());
 		response.setTitulo("Um ou mais campos estão inválidos. Faça o preenchimento correto e tente novamente");
-		response.setDatahora(LocalDateTime.now());
+		response.setDatahora(OffsetDateTime.now());
 		response.setCampos(campos);
 		
 		return super.handleExceptionInternal(ex, response, headers, status, request);
